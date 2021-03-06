@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "dgst/dgst.h"
 #include "enc/enc.h"
 
 int
@@ -16,9 +17,9 @@ main(int argc, char **argv)
 			unsigned char buf[256];
 			int ret;
 			if (dflag)
-				ret = base64_dec(strlen(argv[3]), argv[3], 256, buf);
+				ret = base64_dec(strlen(argv[3]), (unsigned char *)argv[3], 256, buf);
 			else
-				ret = base64_enc(strlen(argv[3]), argv[3], 256, buf);
+				ret = base64_enc(strlen(argv[3]), (unsigned char *)argv[3], 256, buf);
 			for (int i = 0; i < ret; ++i)
 				putchar(buf[i]);
 			putchar('\n');
@@ -32,6 +33,11 @@ main(int argc, char **argv)
 				putchar(buf[i]);
 			putchar('\n');
 		}
-
+	} else if (!strcmp(argv[1], "dgst")) {
+		uint32_t buf[4];
+		md5_dgst(strlen(argv[3]), argv[3], buf);
+		for (int i = 0; i < 4; ++i)
+			printf("%X", buf[3 - i]);
+		printf("\n");
 	}
 }
