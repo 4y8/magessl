@@ -49,18 +49,18 @@ base64_enc(int insize, unsigned char *in, int outsize, unsigned char *out)
 		buf = in[i] << 4;
 		if (o + 4 > outsize)
 			return -1;
-		out[o]     = int2base64(buf >> 6 & 0b111111);
-		out[o + 1] = int2base64(buf & 0b111111);
-		out[o + 2] = '=';
-		out[o + 3] = '=';
+		out[o++] = int2base64(buf >> 6 & 0b111111);
+		out[o++] = int2base64(buf & 0b111111);
+		out[o++] = '=';
+		out[o++] = '=';
 	} else if (insize - i == 2) {
 		buf = in[i] << 10 | in[i + 1] << 2;
 		if (o + 4 > outsize)
 			return -1;
-		out[o]     = int2base64(buf >> 12 & 0b111111);
-		out[o + 1] = int2base64(buf >> 6  & 0b111111);
-		out[o + 2] = int2base64(buf & 0b111111);
-		out[o + 3] = '=';
+		out[o++]   = int2base64(buf >> 12 & 0b111111);
+		out[o++] = int2base64(buf >> 6  & 0b111111);
+		out[o++] = int2base64(buf & 0b111111);
+		out[o++] = '=';
 	}
 	return o;
 }
@@ -74,17 +74,14 @@ base64_dec(int insize, unsigned char *in, int outsize, unsigned char *out)
 	o = 0;
 	for (i = 0; i < insize; i += 4) {
 		buf = 0;
-		for (int j = 0; j < 3; ++j) {
-			if (o + 3 > outsize)
-				return -1;
-
-			if (in[i] == '=')
-				buf <<= 2;
-			else
-				buf |= base642int(in[i]) << (3 - j) * 8;
-			for (int j = 0; j < 3; ++j)
-				out[o++] = buf >> (2 - j) * 8 & 0xFF;
+		if (o + 3 > outsize)
+			return -1;
+		for (int j = 0; j < 4; ++j) {
+			if (in[j] != '=')
+				buf |= base642int(in[j]) << (3 - j) * 6;
 		}
+		for (int j = 0; j < 3; ++j)
+			out[o++] = buf >> (2 - j) * 8 & 0xFF;
 	}
 	return o;
 }
