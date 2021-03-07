@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "dgst.h"
+#include "endian.h"
 
 #define F(B, C, D)	((((C) ^ (D)) & (B)) ^ (D))
 #define G(B, C, D)	((((C) ^ (B)) & (D)) ^ (C))
@@ -30,13 +31,11 @@ static uint32_t K[64] = {
 	0xF7537E82, 0xBD3AF235, 0x2AD7D2BB, 0xEB86D391
 };
 
-static uint32_t padded_sht[48] = {
-	1, 6, 11, 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 5, 8, 11, 14, 1,
-	4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2, 0, 7, 14, 5, 12, 3, 10, 1, 8, 15,
-	6, 13, 4, 11, 2, 9
+static uint32_t sht[64] = {
+	[16] = 1, 6, 11, 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 5, 8, 11,
+	14, 1, 4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2, 0, 7, 14, 5, 12, 3, 10, 1,
+	8, 15, 6, 13, 4, 11, 2, 9
 };
-
-static uint32_t *sht = padded_sht - 16;
 
 static void
 md5_round(unsigned char *buf, uint32_t out[4])
@@ -49,11 +48,8 @@ md5_round(unsigned char *buf, uint32_t out[4])
 	c = out[2];
 	d = out[3];
 
-	for (i = 0; i < 64; i += 4)
-		in[i >> 2] = (uint32_t)buf[i]
-			| (uint32_t)buf[i + 1] << 8
-			| (uint32_t)buf[i + 2] << 16
-			| (uint32_t)buf[i + 2] << 24;
+	dec_blk32le(buf, 64, in);
+
 
 	for (i = 0; i < 16; i += 4) {
 		a = b + ROTL32(a + F(b, c, d) + in[i]     + K[i],      7);
@@ -101,15 +97,11 @@ md5_dgst(uint64_t insize, unsigned char *in, unsigned char out[16])
 		md5_round(in + i, h);
 	memset(buf, 0, 16 * sizeof(uint32_t));
 	memcpy(buf, in + i, insize - i);
-	buf[insize] = 0x80;
+	buf[insize - i] = 0x80;
 	i = insize << 3;
+
 	memcpy(buf + 56, &i, sizeof(uint64_t));
 	md5_round(buf, h);
-	for (i = 0; i < 16; i += 4) {
-		out[i]     = (unsigned char)(h[i >> 2]);
-		out[i + 1] = (unsigned char)(h[i >> 2] >> 8);
-		out[i + 2] = (unsigned char)(h[i >> 2] >> 16);
-		out[i + 3] = (unsigned char)(h[i >> 2] >> 24);
-	}
+	enc_blk32le(h, 4, out);
 	return 1;
 }

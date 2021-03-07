@@ -4,6 +4,49 @@
 #include "dgst/dgst.h"
 #include "enc/enc.h"
 
+static enum mssl_ciphers ciphername(char *s);
+static enum mssl_digests digestname(char *s);
+
+static void enc(int argc, char **argv);
+static void dec(int argc, char **argv);
+static void dgst(int argc, char **argv);
+
+static struct {
+	char *name;
+	void (*cmd)(int argc, char **argv);
+} cmds[] = {{"enc",   enc},
+            {"dec",   dec},
+            {"dgst", dgst}};
+
+static enum mssl_ciphers
+ciphername(char *s)
+{
+	if (!strcmp(s, "base64"))
+		return MSSL_BASE64;
+	return -1;
+}
+
+static enum mssl_digests
+digestname(char *s)
+{
+	return -1;
+}
+
+static void
+enc(int argc, char **argv)
+{
+	enum mssl_ciphers cipher;
+	int dflag;
+
+	cipher = -1;
+	while (argc-- && (*argv)[0] == '-') {
+		
+	}
+}
+
+static void dec(int argc, char **argv);
+static void dgst(int argc, char **argv);
+
 int
 main(int argc, char **argv)
 {
