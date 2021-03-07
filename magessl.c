@@ -34,10 +34,10 @@ main(int argc, char **argv)
 			putchar('\n');
 		}
 	} else if (!strcmp(argv[1], "dgst")) {
-		uint32_t buf[4];
-		md5_dgst(strlen(argv[3]), argv[3], buf);
-		for (int i = 0; i < 4; ++i)
-			printf("%X", buf[3 - i]);
+		unsigned char buf[16];
+		md5_dgst(strlen(argv[3]), (unsigned char *)argv[3], buf);
+		for (int i = 0; i < 16; ++i)
+			printf("%02x", buf[i]);
 		printf("\n");
 	}
 }

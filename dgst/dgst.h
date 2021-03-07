@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-int md5_dgst(uint64_t insize, unsigned char *in, uint32_t out[4]);
-int sha1_dgst(uint64_t insize, unsigned char *in, uint32_t out[5]);
+int md5_dgst(uint64_t insize, unsigned char *in, unsigned char out[16]);
+int sha1_dgst(uint64_t insize, unsigned char *in, unsigned char out[20]);
 
 #endif

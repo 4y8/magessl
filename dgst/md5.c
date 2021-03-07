@@ -1,11 +1,15 @@
 #include <stdint.h>
 #include <string.h>
 
-#define F(B, C, D)	(((C) ^ (D)) & ((B) ^ (D)))
-#define G(B, C, D)	(((B) ^ (C)) & ((D) ^ (C)))
+#include "dgst.h"
+
+#define F(B, C, D)	((((C) ^ (D)) & (B)) ^ (D))
+#define G(B, C, D)	((((C) ^ (B)) & (D)) ^ (C))
 #define H(B, C, D)	((B) ^ (C) ^ (D))
 #define I(B, C, D)	((C) ^ ((B) | ~(D)))
 #define ROTL32(x, n)	(((x) << (n)) | ((x) >> (32 - (n))))
+
+static void md5_round(unsigned char *buf, uint32_t out[4]);
 
 static uint32_t K[64] = {
 	0xD76AA478, 0xE8C7B756, 0x242070DB, 0xC1BDCEEE,
@@ -26,21 +30,31 @@ static uint32_t K[64] = {
 	0xF7537E82, 0xBD3AF235, 0x2AD7D2BB, 0xEB86D391
 };
 
-static uint32_t sht[64] = {
-	7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 8, 11,
-	14, 1, 4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2, 0, 7, 14, 5, 12, 3, 10, 1,
-	8, 15, 6, 13, 4, 11, 2, 9
+static uint32_t padded_sht[48] = {
+	1, 6, 11, 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 5, 8, 11, 14, 1,
+	4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2, 0, 7, 14, 5, 12, 3, 10, 1, 8, 15,
+	6, 13, 4, 11, 2, 9
 };
 
-static void md5_round(uint32_t in[16], uint32_t out[4])
+static uint32_t *sht = padded_sht - 16;
+
+static void
+md5_round(unsigned char *buf, uint32_t out[4])
 {
-	uint32_t a, b, c, d;
+	uint32_t a, b, c, d, in[16];
 	int i;
 
 	a = out[0];
 	b = out[1];
 	c = out[2];
 	d = out[3];
+
+	for (i = 0; i < 64; i += 4)
+		in[i >> 2] = (uint32_t)buf[i]
+			| (uint32_t)buf[i + 1] << 8
+			| (uint32_t)buf[i + 2] << 16
+			| (uint32_t)buf[i + 2] << 24;
+
 	for (i = 0; i < 16; i += 4) {
 		a = b + ROTL32(a + F(b, c, d) + in[i]     + K[i],      7);
 		d = a + ROTL32(d + F(a, b, c) + in[i + 1] + K[i + 1], 12);
@@ -48,22 +62,22 @@ static void md5_round(uint32_t in[16], uint32_t out[4])
 		b = c + ROTL32(b + F(c, d, a) + in[i + 3] + K[i + 3], 22);
 	}
 	for (; i < 32; i += 4) {
-		a = b + ROTL32(a + G(b, c, d) + in[sht[i - 16]] + K[i],      7);
-		d = a + ROTL32(d + G(a, b, c) + in[sht[i - 15]] + K[i + 1],  9);
-		c = d + ROTL32(c + G(d, a, b) + in[sht[i - 14]] + K[i + 2], 14);
-		b = c + ROTL32(b + G(c, d, a) + in[sht[i - 13]] + K[i + 3], 20);
+		a = b + ROTL32(a + G(b, c, d) + in[sht[i]]     + K[i],      5);
+		d = a + ROTL32(d + G(a, b, c) + in[sht[i + 1]] + K[i + 1],  9);
+		c = d + ROTL32(c + G(d, a, b) + in[sht[i + 2]] + K[i + 2], 14);
+		b = c + ROTL32(b + G(c, d, a) + in[sht[i + 3]] + K[i + 3], 20);
 	}
 	for (; i < 48; i += 4) {
-		a = b + ROTL32(a + H(b, c, d) + in[sht[i - 16]] + K[i],      4);
-		d = a + ROTL32(d + H(a, b, c) + in[sht[i - 15]] + K[i + 1], 16);
-		c = d + ROTL32(c + H(d, a, b) + in[sht[i - 14]] + K[i + 2], 13);
-		b = c + ROTL32(b + H(c, d, a) + in[sht[i - 13]] + K[i + 3], 20);
+		a = b + ROTL32(a + H(b, c, d) + in[sht[i]]     +  K[i],     4);
+		d = a + ROTL32(d + H(a, b, c) + in[sht[i + 1]] + K[i + 1], 11);
+		c = d + ROTL32(c + H(d, a, b) + in[sht[i + 2]] + K[i + 2], 16);
+		b = c + ROTL32(b + H(c, d, a) + in[sht[i + 3]] + K[i + 3], 23);
 	}
 	for (; i < 64; i += 4) {
-		a = b + ROTL32(a + I(b, c, d) + in[sht[i - 16]] + K[i],      6);
-		d = a + ROTL32(d + I(a, b, c) + in[sht[i - 15]] + K[i + 1], 10);
-		c = d + ROTL32(c + I(d, a, b) + in[sht[i - 14]] + K[i + 2], 15);
-		b = c + ROTL32(b + I(c, d, a) + in[sht[i - 13]] + K[i + 3], 21);
+		a = b + ROTL32(a + I(b, c, d) + in[sht[i]]     + K[i],      6);
+		d = a + ROTL32(d + I(a, b, c) + in[sht[i + 1]] + K[i + 1], 10);
+		c = d + ROTL32(c + I(d, a, b) + in[sht[i + 2]] + K[i + 2], 15);
+		b = c + ROTL32(b + I(c, d, a) + in[sht[i + 3]] + K[i + 3], 21);
 	}
 	out[0] += a;
 	out[1] += b;
@@ -71,24 +85,31 @@ static void md5_round(uint32_t in[16], uint32_t out[4])
 	out[3] += d;
 }
 
-int
-md5_dgst(uint64_t insize, unsigned char *in, uint32_t out[4])
-{
-	int i;
-	uint32_t buf[16];
 
-	out[0] = 0x67452301;
-	out[1] = 0xEFCDAB89;
-	out[2] = 0x98BADCFE;
-	out[3] = 0x10325476;
-	for (i = 0; i + 64 < insize; i += 64) {
-		memcpy(buf, in + i, 64);
-		md5_round(buf, out);
-	}
+int
+md5_dgst(uint64_t insize, unsigned char *in, unsigned char out[16])
+{
+	uint64_t i;
+	uint32_t h[4];
+	unsigned char buf[64];
+
+	h[0] = 0x67452301;
+	h[1] = 0xEFCDAB89;
+	h[2] = 0x98BADCFE;
+	h[3] = 0x10325476;
+	for (i = 0; i + 64 < insize; i += 64)
+		md5_round(in + i, h);
 	memset(buf, 0, 16 * sizeof(uint32_t));
 	memcpy(buf, in + i, insize - i);
-	buf[insize >> 3] = 1 << 31;
-	memcpy(buf + 14, &insize, sizeof(uint64_t));
-	md5_round(buf, out);
+	buf[insize] = 0x80;
+	i = insize << 3;
+	memcpy(buf + 56, &i, sizeof(uint64_t));
+	md5_round(buf, h);
+	for (i = 0; i < 16; i += 4) {
+		out[i]     = (unsigned char)(h[i >> 2]);
+		out[i + 1] = (unsigned char)(h[i >> 2] >> 8);
+		out[i + 2] = (unsigned char)(h[i >> 2] >> 16);
+		out[i + 3] = (unsigned char)(h[i >> 2] >> 24);
+	}
 	return 1;
 }
