@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "error.h"
+
 #include "dgst/dgst.h"
 #include "enc/enc.h"
 
@@ -35,48 +37,104 @@ digestname(char *s)
 static void
 enc(int argc, char **argv)
 {
-	enum mssl_ciphers cipher;
-	int dflag;
+	char *p;
+	unsigned char *up;
+	int dflag, i, len, ret;
+	enum mssl_ciphers cipher, tmpcipher;
 
 	cipher = -1;
-	while (argc-- && (*argv)[0] == '-') {
-		
+	i = 0;
+	dflag = 0;
+	while (argc-- && (*argv)[i] == '-') {
+		p = (*(argv++)) + ++i;
+		if (!strcmp(p, "d"))
+			dflag = 1;
+		else if ((tmpcipher = ciphername(p)) > 0)
+			cipher = tmpcipher;
+		else
+			error("invalid option: -%s", p);
+	}
+	if (cipher < 0)
+		error("no cipher given");
+	if (argc != 1)
+		error("invalid number of arguments");
+	up = (unsigned char *)argv[i];
+	len = strlen(argv[i]);
+	switch (cipher) {
+	case MSSL_BASE64: {
+		int outlen = 4 / 3 * (len + 2);
+		unsigned char out[outlen];
+		if (dflag)
+			ret = base64_dec(len, up, outlen, out);
+		else
+			ret = base64_enc(len, up, outlen, out);
+		if (ret < 0)
+			error("couldn't run cipher");
+		for (int i = 0; i < ret; ++i)
+			putchar(out[i]);
+		putchar('\n');
+		break;
+	}
 	}
 }
 
-static void dec(int argc, char **argv);
-static void dgst(int argc, char **argv);
+static void
+dec(int argc, char **argv)
+{
+	char *p;
+	unsigned char *up;
+	int i, len, ret;
+	enum mssl_ciphers cipher, tmpcipher;
+
+	cipher = -1;
+	i = 0;
+	while (argc-- && (*argv)[i] == '-') {
+		p = (*(argv++)) + ++i;
+		if ((tmpcipher = ciphername(p)) > 0)
+			cipher = tmpcipher;
+		else
+			error("invalid option: -%s", p);
+	}
+	if (cipher < 0)
+		error("no cipher given");
+	if (argc != 1)
+		error("invalid number of arguments");
+	up = (unsigned char *)argv[i];
+	len = strlen(argv[i]);
+	switch (cipher) {
+	case MSSL_BASE64: {
+		int outlen = 4 / 3 * (len + 2);
+		unsigned char out[outlen];
+		ret = base64_dec(len, up, outlen, out);
+		if (ret < 0)
+			error("couldn't run cipher");
+		for (int i = 0; i < ret; ++i)
+			putchar(out[i]);
+		putchar('\n');
+		break;
+	}
+	}
+}
+
+static void
+dgst(int argc, char **argv)
+{
+	
+}
 
 int
 main(int argc, char **argv)
 {
-	int dflag;
 
-	dflag = 0;
 	if (argc == 1)
 		return 1;
-	if (!strcmp(argv[1], "enc")) {
-		if (!strcmp(argv[2], "-base64")) {
-			unsigned char buf[256];
-			int ret;
-			if (dflag)
-				ret = base64_dec(strlen(argv[3]), (unsigned char *)argv[3], 256, buf);
-			else
-				ret = base64_enc(strlen(argv[3]), (unsigned char *)argv[3], 256, buf);
-			for (int i = 0; i < ret; ++i)
-				putchar(buf[i]);
-			putchar('\n');
-		}
-	} else if (!strcmp(argv[1], "dec")) {
-		if (!strcmp(argv[2], "-base64")) {
-			unsigned char buf[256];
-			int ret;
-			ret = base64_dec(strlen(argv[3]), argv[3], 256, buf);
-			for (int i = 0; i < ret; ++i)
-				putchar(buf[i]);
-			putchar('\n');
-		}
-	} else if (!strcmp(argv[1], "dgst")) {
+
+	for (int i = 0; i < sizeof(cmds) / sizeof(cmds[0]); ++i)
+		if (!strcmp(argv[1], cmds[i].name))
+			cmds[i].cmd(argc - 2, argv + 2);
+	return 1;
+
+	if (!strcmp(argv[1], "dgst")) {
 		unsigned char buf[16];
 		md5_dgst(strlen(argv[3]), (unsigned char *)argv[3], buf);
 		for (int i = 0; i < 16; ++i)
