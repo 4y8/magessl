@@ -8,6 +8,8 @@
 #define G(B, C, D)	((((C) ^ (B)) & (D)) ^ (C))
 #define H(B, C, D)	((B) ^ (C) ^ (D))
 #define I(B, C, D)	((C) ^ ((B) | ~(D)))
+/* GCC warnings want me to put parentheses around the soustraction, event if
+ * it's useless according to the C standard... */
 #define ROTL32(x, n)	(((x) << (n)) | ((x) >> (32 - (n))))
 
 static void md5_round(unsigned char *buf, uint32_t out[4]);
@@ -40,7 +42,7 @@ static uint32_t sht[64] = {
 static void
 md5_round(unsigned char *buf, uint32_t out[4])
 {
-	uint32_t a, b, c, d, in[16];
+	uint32_t w[16], a, b, c, d;
 	int i;
 
 	a = out[0];
@@ -48,32 +50,32 @@ md5_round(unsigned char *buf, uint32_t out[4])
 	c = out[2];
 	d = out[3];
 
-	dec_blk32le(buf, 64, in);
+	dec_blk32le(buf, 64, w);
 
 
 	for (i = 0; i < 16; i += 4) {
-		a = b + ROTL32(a + F(b, c, d) + in[i]     + K[i],      7);
-		d = a + ROTL32(d + F(a, b, c) + in[i + 1] + K[i + 1], 12);
-		c = d + ROTL32(c + F(d, a, b) + in[i + 2] + K[i + 2], 17);
-		b = c + ROTL32(b + F(c, d, a) + in[i + 3] + K[i + 3], 22);
+		a = b + ROTL32(a + F(b, c, d) + w[i]     + K[i],      7);
+		d = a + ROTL32(d + F(a, b, c) + w[i + 1] + K[i + 1], 12);
+		c = d + ROTL32(c + F(d, a, b) + w[i + 2] + K[i + 2], 17);
+		b = c + ROTL32(b + F(c, d, a) + w[i + 3] + K[i + 3], 22);
 	}
 	for (; i < 32; i += 4) {
-		a = b + ROTL32(a + G(b, c, d) + in[sht[i]]     + K[i],      5);
-		d = a + ROTL32(d + G(a, b, c) + in[sht[i + 1]] + K[i + 1],  9);
-		c = d + ROTL32(c + G(d, a, b) + in[sht[i + 2]] + K[i + 2], 14);
-		b = c + ROTL32(b + G(c, d, a) + in[sht[i + 3]] + K[i + 3], 20);
+		a = b + ROTL32(a + G(b, c, d) + w[sht[i]]     + K[i],      5);
+		d = a + ROTL32(d + G(a, b, c) + w[sht[i + 1]] + K[i + 1],  9);
+		c = d + ROTL32(c + G(d, a, b) + w[sht[i + 2]] + K[i + 2], 14);
+		b = c + ROTL32(b + G(c, d, a) + w[sht[i + 3]] + K[i + 3], 20);
 	}
 	for (; i < 48; i += 4) {
-		a = b + ROTL32(a + H(b, c, d) + in[sht[i]]     +  K[i],     4);
-		d = a + ROTL32(d + H(a, b, c) + in[sht[i + 1]] + K[i + 1], 11);
-		c = d + ROTL32(c + H(d, a, b) + in[sht[i + 2]] + K[i + 2], 16);
-		b = c + ROTL32(b + H(c, d, a) + in[sht[i + 3]] + K[i + 3], 23);
+		a = b + ROTL32(a + H(b, c, d) + w[sht[i]]     +  K[i],     4);
+		d = a + ROTL32(d + H(a, b, c) + w[sht[i + 1]] + K[i + 1], 11);
+		c = d + ROTL32(c + H(d, a, b) + w[sht[i + 2]] + K[i + 2], 16);
+		b = c + ROTL32(b + H(c, d, a) + w[sht[i + 3]] + K[i + 3], 23);
 	}
 	for (; i < 64; i += 4) {
-		a = b + ROTL32(a + I(b, c, d) + in[sht[i]]     + K[i],      6);
-		d = a + ROTL32(d + I(a, b, c) + in[sht[i + 1]] + K[i + 1], 10);
-		c = d + ROTL32(c + I(d, a, b) + in[sht[i + 2]] + K[i + 2], 15);
-		b = c + ROTL32(b + I(c, d, a) + in[sht[i + 3]] + K[i + 3], 21);
+		a = b + ROTL32(a + I(b, c, d) + w[sht[i]]     + K[i],      6);
+		d = a + ROTL32(d + I(a, b, c) + w[sht[i + 1]] + K[i + 1], 10);
+		c = d + ROTL32(c + I(d, a, b) + w[sht[i + 2]] + K[i + 2], 15);
+		b = c + ROTL32(b + I(c, d, a) + w[sht[i + 3]] + K[i + 3], 21);
 	}
 	out[0] += a;
 	out[1] += b;
