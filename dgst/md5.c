@@ -100,9 +100,8 @@ md5_dgst(uint64_t insize, unsigned char *in, unsigned char out[16])
 	memset(buf, 0, 16 * sizeof(uint32_t));
 	memcpy(buf, in + i, insize - i);
 	buf[insize - i] = 0x80;
-	i = insize << 3;
 
-	memcpy(buf + 56, &i, sizeof(uint64_t));
+	*((uint64_t *)(buf + 56)) = insize << 3;
 	md5_round(buf, h);
 	enc_blk32le(h, 4, out);
 	return 1;

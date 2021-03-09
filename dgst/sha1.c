@@ -29,7 +29,7 @@ sha1_round(unsigned char *buf, uint32_t out[5])
 	d = out[3];
 	e = out[4];
 
-	dec_blk32le(buf, 64, w);
+	dec_blk32be(buf, 64, w);
 
 	for (i = 16; i < 80; ++i)
 		w[i] = ROTL32(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i -16], 1);
@@ -91,11 +91,10 @@ sha1_dgst(uint64_t insize, unsigned char *in, unsigned char out[20])
 	memset(buf, 0, 16 * sizeof(uint32_t));
 	memcpy(buf, in + i, insize - i);
 	buf[insize - i] = 0x80;
-	i = insize << 3;
 
-	memcpy(buf + 56, &i, sizeof(uint64_t));
+	enc64be(insize << 3, buf + 56);
 	sha1_round(buf, h);
-	enc_blk32le(h, 4, out);
+	enc_blk32be(h, 5, out);
 	return 1;
 }
 

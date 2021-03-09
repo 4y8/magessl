@@ -9,4 +9,13 @@ void enc32le(uint32_t in, unsigned char out[4]);
 void dec_blk32le(unsigned char *in, uint64_t size, uint32_t *out);
 void enc_blk32le(uint32_t *in, uint64_t size, unsigned char *out);
 
+void dec32be(unsigned char in[4], uint32_t *out);
+void enc32be(uint32_t in, unsigned char out[4]);
+
+void dec_blk32be(unsigned char *in, uint64_t size, uint32_t *out);
+void enc_blk32be(uint32_t *in, uint64_t size, unsigned char *out);
+
+void dec64be(unsigned char in[8], uint64_t *out);
+void enc64be(uint64_t in, unsigned char out[8]);
+
 #endif
