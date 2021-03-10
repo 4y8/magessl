@@ -8,9 +8,6 @@
 #define G(B, C, D)	((((C) ^ (B)) & (D)) ^ (C))
 #define H(B, C, D)	((B) ^ (C) ^ (D))
 #define I(B, C, D)	((C) ^ ((B) | ~(D)))
-/* GCC warnings want me to put parentheses around the soustraction, event if
- * it's useless according to the C standard... */
-#define ROTL32(x, n)	(((x) << (n)) | ((x) >> (32 - (n))))
 
 static void md5_round(unsigned char *buf, uint32_t out[4]);
 
@@ -52,7 +49,6 @@ md5_round(unsigned char *buf, uint32_t out[4])
 
 	dec_blk32le(buf, 64, w);
 
-
 	for (i = 0; i < 16; i += 4) {
 		a = b + ROTL32(a + F(b, c, d) + w[i]     + K[i],      7);
 		d = a + ROTL32(d + F(a, b, c) + w[i + 1] + K[i + 1], 12);
@@ -77,6 +73,7 @@ md5_round(unsigned char *buf, uint32_t out[4])
 		c = d + ROTL32(c + I(d, a, b) + w[sht[i + 2]] + K[i + 2], 15);
 		b = c + ROTL32(b + I(c, d, a) + w[sht[i + 3]] + K[i + 3], 21);
 	}
+
 	out[0] += a;
 	out[1] += b;
 	out[2] += c;

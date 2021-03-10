@@ -8,7 +8,6 @@
 #define G(B, C, D)	((B) ^ (C) ^ (D))
 #define H(B, C, D)	(((D) & (C)) | (((D) | (C)) & (B)))
 #define I(B, C, D)	((B) ^ (C) ^ (D))
-#define ROTL32(x, n)	(((x) << (n)) | ((x) >> (32 - (n))))
 
 static uint32_t K[4] = {
 	0x5A827999,
