@@ -33,6 +33,8 @@ digestname(char *s)
 		return MSSL_MD5;
 	else if (!strcmp(s, "sha1"))
 		return MSSL_SHA1;
+	else if (!strcmp(s, "md4"))
+		return MSSL_MD4;
 	return -1;
 }
 
@@ -122,8 +124,16 @@ dgst(int argc, char **argv)
 		printf("\n");
 		break;
 	}
-	default:
+	case MSSL_MD4: {
+		unsigned char out[16];
+		if (md4_dgst(len, up, out) < 0)
+			error("digest failed");
+
+		for (int i = 0; i < 16; ++i)
+			printf("%02x", out[i]);
+		printf("\n");
 		break;
+	}
 	}
 }
 

@@ -96,4 +96,3 @@ sha1_dgst(uint64_t insize, unsigned char *in, unsigned char out[20])
 	enc_blk32be(h, 5, out);
 	return 1;
 }
-
