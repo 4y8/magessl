@@ -17,8 +17,6 @@ static uint32_t sht[16] = {
 
 static void md4_round(unsigned char *buf, uint32_t out[4]);
 
-#include <stdio.h>
-
 static void
 md4_round(unsigned char *buf, uint32_t out[4])
 {
@@ -40,9 +38,9 @@ md4_round(unsigned char *buf, uint32_t out[4])
 	}
 	for (i = 0; i < 16; i += 4) {
 		a = ROTL32(a + G(b, c, d) + w[i >> 2]       + K2,  3);
-		d = ROTL32(d + G(a, b, c) + w[(i >> 2) + 1] + K2,  5);
-		c = ROTL32(c + G(d, a, b) + w[(i >> 2) + 2] + K2,  9);
-		b = ROTL32(b + G(c, d, a) + w[(i >> 2) + 3] + K2, 13);
+		d = ROTL32(d + G(a, b, c) + w[(i >> 2) + 4] + K2,  5);
+		c = ROTL32(c + G(d, a, b) + w[(i >> 2) + 8] + K2,  9);
+		b = ROTL32(b + G(c, d, a) + w[(i >> 2) + 12] + K2, 13);
 	}
 	for (i = 0; i < 16; i += 4) {
 		a = ROTL32(a + H(b, c, d) + w[sht[i]]     + K3,  3);
@@ -74,8 +72,7 @@ md4_dgst(uint64_t insize, unsigned char *in, unsigned char out[16])
 	memcpy(buf, in + i, insize - i);
 	buf[insize - i] = 0x80;
 
-	*((uint32_t *)(buf + 56)) = (uint32_t)(insize << 3);
-	*((uint32_t *)(buf + 60)) = (uint32_t)(insize >> 29);
+	*((uint64_t *)(buf + 56)) = insize << 3;
 	md4_round(buf, h);
 	enc_blk32le(h, 4, out);
 	return 1;
