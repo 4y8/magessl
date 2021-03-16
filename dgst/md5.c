@@ -80,7 +80,6 @@ md5_round(unsigned char *buf, uint32_t out[4])
 	out[3] += d;
 }
 
-
 int
 md5_dgst(uint64_t insize, unsigned char *in, unsigned char out[16])
 {

@@ -9,6 +9,8 @@
 #define H(B, C, D)	(((D) & (C)) | (((D) | (C)) & (B)))
 #define I(B, C, D)	((B) ^ (C) ^ (D))
 
+static void sha1_round(unsigned char *buf, uint32_t out[5]);
+
 static uint32_t K[4] = {
 	0x5A827999,
 	0x6ED9EBA1,
@@ -19,7 +21,7 @@ static uint32_t K[4] = {
 static void
 sha1_round(unsigned char *buf, uint32_t out[5])
 {
-	uint32_t w[80], a, b, c, d, e, tmp;
+	uint32_t w[80], a, b, c, d, e, t;
 	int i;
 
 	a = out[0];
@@ -34,36 +36,36 @@ sha1_round(unsigned char *buf, uint32_t out[5])
 		w[i] = ROTL32(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i -16], 1);
 
 	for (i = 0; i < 20; ++i) {
-		tmp = ROTL32(a, 5) + F(b, c, d) + e + w[i] + K[0];
+		t = ROTL32(a, 5) + F(b, c, d) + e + w[i] + K[0];
 		e = d;
 		d = c;
 		c = ROTL32(b, 30);
 		b = a;
-		a = tmp;
+		a = t;
 	}
 	for (; i < 40; ++i) {
-		tmp = ROTL32(a, 5) + G(b, c, d) + e + w[i] + K[1];
+		t = ROTL32(a, 5) + G(b, c, d) + e + w[i] + K[1];
 		e = d;
 		d = c;
 		c = ROTL32(b, 30);
 		b = a;
-		a = tmp;
+		a = t;
 	}
 	for (; i < 60; ++i) {
-		tmp = ROTL32(a, 5) + H(b, c, d) + e + w[i] + K[2];
+		t = ROTL32(a, 5) + H(b, c, d) + e + w[i] + K[2];
 		e = d;
 		d = c;
 		c = ROTL32(b, 30);
 		b = a;
-		a = tmp;
+		a = t;
 	}
 	for (; i < 80; ++i) {
-		tmp = ROTL32(a, 5) + I(b, c, d) + e + w[i] + K[3];
+		t = ROTL32(a, 5) + I(b, c, d) + e + w[i] + K[3];
 		e = d;
 		d = c;
 		c = ROTL32(b, 30);
 		b = a;
-		a = tmp;
+		a = t;
 	}
 	out[0] += a;
 	out[1] += b;

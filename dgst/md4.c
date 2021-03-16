@@ -8,14 +8,14 @@
 #define G(B, C, D)	(((B) & (C)) | ((B) & (D)) | ((C) & (D)))
 #define H(B, C, D)	((B) ^ (C) ^ (D))
 
-#define K2 0x5a827999
-#define K3 0x6ed9eba1
+static void md4_round(unsigned char *buf, uint32_t out[4]);
+
+#define K2 0x5A827999
+#define K3 0x6ED9EBA1
 
 static uint32_t sht[16] = {
 	0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15
 };
-
-static void md4_round(unsigned char *buf, uint32_t out[4]);
 
 static void
 md4_round(unsigned char *buf, uint32_t out[4])
