@@ -103,3 +103,30 @@ sha256_dgst(uint64_t insize, unsigned char *in, unsigned char out[32])
 	enc_blk32be(h, 8, out);
 	return 1;
 }
+
+int
+sha224_dgst(uint64_t insize, unsigned char *in, unsigned char out[28])
+{
+	unsigned char buf[64];
+	uint32_t h[8];
+	uint64_t i;
+
+	h[0] = 0xC1059ED8;
+	h[1] = 0x367CD507;
+	h[2] = 0x3070DD17;
+	h[3] = 0xF70E5939;
+	h[4] = 0xFFC00B31;
+	h[5] = 0x68581511;
+	h[6] = 0x64F98FA7;
+	h[7] = 0xBEFA4FA4;
+	for (i = 0; i + 64 < insize; i += 64)
+		sha256_round(in + i, h);
+	memset(buf, 0, 16 * sizeof(uint32_t));
+	memcpy(buf, in + i, insize - i);
+	buf[insize - i] = 0x80;
+
+	enc64be(insize << 3, buf + 56);
+	sha256_round(buf, h);
+	enc_blk32be(h, 7, out);
+	return 1;
+}
