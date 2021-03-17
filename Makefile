@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -O2 -fstack-protector-all
 INCLUDES = -I.
 SRCS = enc/base64.c dgst/md5.c dgst/md4.c dgst/sha1.c dgst/ripemd.c endian.c \
-       error.c magessl.c
+       dgst/sha256.c error.c magessl.c
 OBJS = $(SRCS:.c=.o)
 
 TARGET = magessl
