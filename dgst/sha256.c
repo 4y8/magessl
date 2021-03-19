@@ -11,7 +11,7 @@
 #define SSIG0(x)	(ROTR32(x, 7) ^ ROTR32(x, 18) ^ ((x) >> 3))
 #define SSIG1(x)	(ROTR32(x, 17) ^ ROTR32(x, 19) ^ ((x) >> 10))
 
-static void sha256_round(unsigned char *buf, uint32_t out[8]);
+static void sha256_round(uchar *buf, uint32_t out[8]);
 
 static uint32_t K[64] = {
 	0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
@@ -33,7 +33,7 @@ static uint32_t K[64] = {
 };
 
 static void
-sha256_round(unsigned char *buf, uint32_t out[8])
+sha256_round(uchar *buf, uint32_t out[8])
 {
 	uint32_t w[64];
 	uint32_t a, b, c, d, e, f, g, h;
@@ -78,9 +78,9 @@ sha256_round(unsigned char *buf, uint32_t out[8])
 }
 
 int
-sha256_dgst(uint64_t insize, unsigned char *in, unsigned char out[32])
+sha256_dgst(uint64_t insize, uchar *in, uchar out[32])
 {
-	unsigned char buf[64];
+	uchar buf[64];
 	uint32_t h[8];
 	uint64_t i;
 
@@ -105,9 +105,9 @@ sha256_dgst(uint64_t insize, unsigned char *in, unsigned char out[32])
 }
 
 int
-sha224_dgst(uint64_t insize, unsigned char *in, unsigned char out[28])
+sha224_dgst(uint64_t insize, uchar *in, uchar out[28])
 {
-	unsigned char buf[64];
+	uchar buf[64];
 	uint32_t h[8];
 	uint64_t i;
 

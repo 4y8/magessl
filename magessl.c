@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "endian.h"
 #include "error.h"
 
 #include "dgst/dgst.h"
@@ -48,7 +49,7 @@ static void
 enc(int argc, char **argv)
 {
 	char *p;
-	unsigned char *up;
+	uchar *up;
 	int dflag, i, len, ret;
 	enum mssl_ciphers cipher, tmpcipher;
 
@@ -67,12 +68,12 @@ enc(int argc, char **argv)
 		error("no cipher given");
 	if (argc < 1)
 		error("invalid number of arguments");
-	up = (unsigned char *)argv[i];
+	up = (uchar *)argv[i];
 	len = strlen(argv[i]);
 	switch (cipher) {
 	case MSSL_BASE64: {
 		int outlen = 4 / 3 * (len + 2);
-		unsigned char out[outlen];
+		uchar out[outlen];
 		if (dflag)
 			ret = base64_dec(len, up, outlen, out);
 		else
@@ -91,7 +92,7 @@ static void
 dgst(int argc, char **argv)
 {
 	char *p;
-	unsigned char *up;
+	uchar *up;
 	int i, len;
 	enum mssl_digests digest, tmpdgst;
 
@@ -107,11 +108,11 @@ dgst(int argc, char **argv)
 		error("no digest given");
 	if (argc < 1)
 		error("invalid number of arguments");
-	up = (unsigned char *)argv[i];
+	up = (uchar *)argv[i];
 	len = strlen(argv[i]);
 	switch (digest) {
 	case MSSL_MD5: {
-		unsigned char out[16];
+		uchar out[16];
 		if (md5_dgst(len, up, out) < 0)
 			error("digest failed");
 
@@ -121,7 +122,7 @@ dgst(int argc, char **argv)
 		break;
 	}
 	case MSSL_SHA1: {
-		unsigned char out[20];
+		uchar out[20];
 		if (sha1_dgst(len, up, out) < 0)
 			error("digest failed");
 
@@ -131,7 +132,7 @@ dgst(int argc, char **argv)
 		break;
 	}
 	case MSSL_SHA224: {
-		unsigned char out[28];
+		uchar out[28];
 		if (sha224_dgst(len, up, out) < 0)
 			error("digest failed");
 
@@ -141,7 +142,7 @@ dgst(int argc, char **argv)
 		break;
 	}
 	case MSSL_SHA256: {
-		unsigned char out[32];
+		uchar out[32];
 		if (sha256_dgst(len, up, out) < 0)
 			error("digest failed");
 
@@ -151,7 +152,7 @@ dgst(int argc, char **argv)
 		break;
 	}
 	case MSSL_MD4: {
-		unsigned char out[16];
+		uchar out[16];
 		if (md4_dgst(len, up, out) < 0)
 			error("digest failed");
 
@@ -161,7 +162,7 @@ dgst(int argc, char **argv)
 		break;
 	}
 	case MSSL_RIPEMD: {
-		unsigned char out[20];
+		uchar out[20];
 		if (ripemd_dgst(len, up, out) < 0)
 			error("digest failed");
 

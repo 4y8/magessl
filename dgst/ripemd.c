@@ -22,7 +22,7 @@
 #define KR3	0x7A6D76E9
 #define KR4	0x00000000
 
-static void ripemd_round(unsigned char *buf, uint32_t out[5]);
+static void ripemd_round(uchar *buf, uint32_t out[5]);
 
 
 static uint32_t shtl[80] = {
@@ -58,7 +58,7 @@ static uint32_t rotr[80] = {
 };
 
 static void
-ripemd_round(unsigned char *buf, uint32_t out[5])
+ripemd_round(uchar *buf, uint32_t out[5])
 {
 	uint32_t w[16];
 	uint32_t al, bl, cl, dl, el;
@@ -164,9 +164,9 @@ ripemd_round(unsigned char *buf, uint32_t out[5])
 }
 
 int
-ripemd_dgst(uint64_t insize, unsigned char *in, unsigned char out[20])
+ripemd_dgst(uint64_t insize, uchar *in, uchar out[20])
 {
-	unsigned char buf[64];
+	uchar buf[64];
 	uint32_t h[5];
 	uint64_t i;
 

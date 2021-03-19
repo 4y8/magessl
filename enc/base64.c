@@ -1,12 +1,13 @@
 #include <stdint.h>
 
 #include "enc.h"
+#include "endian.h"
 
-static unsigned char int2base64(unsigned char c);
-static unsigned char base642int(unsigned char c);
+static uchar int2base64(uchar c);
+static uchar base642int(uchar c);
 
-static unsigned char
-int2base64(unsigned char c)
+static uchar
+int2base64(uchar c)
 {
 	if (c <= 25)
 		return c + 'A';
@@ -17,8 +18,8 @@ int2base64(unsigned char c)
 	return c == 62 ? '+' : '/';
 }
 
-static unsigned char
-base642int(unsigned char c)
+static uchar
+base642int(uchar c)
 {
 	if ('A' <= c && c <= 'Z')
 		return c - 'A';
@@ -30,7 +31,7 @@ base642int(unsigned char c)
 }
 
 int
-base64_enc(int insize, unsigned char *in, int outsize, unsigned char *out)
+base64_enc(int insize, uchar *in, int outsize, uchar *out)
 {
 	uint32_t buf;
 	int i, o;
@@ -66,7 +67,7 @@ base64_enc(int insize, unsigned char *in, int outsize, unsigned char *out)
 }
 
 int
-base64_dec(int insize, unsigned char *in, int outsize, unsigned char *out)
+base64_dec(int insize, uchar *in, int outsize, uchar *out)
 {
 	uint32_t buf;
 	int i, o;
