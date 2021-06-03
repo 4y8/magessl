@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-/* GCC warnings want me to put parentheses around the soustraction, event if
+/* GCC warnings want me to put parentheses around the substraction, event if
  * it's useless according to the C standard... */
 #define ROTL32(x, n)	(((x) << (n)) | ((x) >> (32 - (n))))
 #define ROTR32(x, n)	(((x) << (32 - (n))) | ((x) >> (n)))

@@ -2,13 +2,14 @@
 #define _MAGESSL_DGST_H_
 
 #include <stdint.h>
+#include <endian.h>
 
-int md4_dgst(uint64_t insize, unsigned char *in, unsigned char out[16]);
-int md5_dgst(uint64_t insize, unsigned char *in, unsigned char out[16]);
-int sha1_dgst(uint64_t insize, unsigned char *in, unsigned char out[20]);
-int sha224_dgst(uint64_t insize, unsigned char *in, unsigned char out[32]);
-int sha256_dgst(uint64_t insize, unsigned char *in, unsigned char out[32]);
-int ripemd_dgst(uint64_t insize, unsigned char *in, unsigned char out[20]);
+int md4_dgst(ulong insize, uchar *in, uchar out[16]);
+int md5_dgst(ulong insize, uchar *in, uchar out[16]);
+int sha1_dgst(ulong insize, uchar *in, uchar out[20]);
+int sha224_dgst(ulong insize, uchar *in, uchar out[32]);
+int sha256_dgst(ulong insize, uchar *in, uchar out[32]);
+int ripemd_dgst(ulong insize, uchar *in, uchar out[20]);
 
 enum mssl_digests {
 	MSSL_MD4,
@@ -18,5 +19,7 @@ enum mssl_digests {
 	MSSL_SHA256,
 	MSSL_RIPEMD
 };
+
+typedef int MSSLDigest(ulong, uchar *, uchar *);
 
 #endif
