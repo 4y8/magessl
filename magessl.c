@@ -4,8 +4,8 @@
 #include "endian.h"
 #include "error.h"
 
-#include "dgst/dgst.h"
-#include "enc/enc.h"
+#include <dgst.h>
+#include <enc.h>
 
 static enum mssl_ciphers ciphername(char *s);
 static enum mssl_digests digestname(char *s);

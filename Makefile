@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -O2 -fstack-protector-all
-INCLUDES = -I. -Idgst -Ienc -Ikdf
+INCLUDES = -Iinclude -I.
 SRCS = enc/base64.c dgst/md5.c dgst/md4.c dgst/sha1.c dgst/ripemd.c endian.c \
        dgst/sha256.c error.c enc/chacha20.c kdf/argon2.c kdf/pbkdf2.c magessl.c
 OBJS = $(SRCS:.c=.o)

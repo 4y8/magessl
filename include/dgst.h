@@ -20,6 +20,9 @@ enum mssl_digests {
 	MSSL_RIPEMD
 };
 
-typedef int MSSLDigest(ulong, uchar *, uchar *);
+typedef struct {
+	int (*f)(ulong, uchar *, uchar *);
+	int len;
+} MSSLDigest;
 
 #endif

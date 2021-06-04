@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "dgst.h"
-#include "endian.h"
+#include <dgst.h>
+#include <endian.h>
 
 #define F(B, C, D)	((((C) ^ (D)) & (B)) ^ (D))
 #define G(B, C, D)	(((B) & (C)) | ((B) & (D)) | ((C) & (D)))
@@ -56,7 +56,7 @@ md4_round(uchar *buf, uint32_t out[4])
 }
 
 int
-md4_dgst(uint64_t insize, uchar *in, uchar out[16])
+md4_dgst(ulong insize, uchar *in, uchar out[16])
 {
 	uint64_t i;
 	uint32_t h[4];

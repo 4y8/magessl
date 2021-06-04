@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "dgst.h"
-#include "endian.h"
+#include <dgst.h>
+#include <endian.h>
 
 #define F(B, C, D)	((((C) ^ (D)) & (B)) ^ (D))
 #define G(B, C, D)	((((C) ^ (B)) & (D)) ^ (C))
@@ -37,7 +37,7 @@ static uint32_t sht[64] = {
 };
 
 static void
-md5_round(unsigned char *buf, uint32_t out[4])
+md5_round(uchar *buf, uint32_t out[4])
 {
 	uint32_t w[16], a, b, c, d;
 	int i;
@@ -81,7 +81,7 @@ md5_round(unsigned char *buf, uint32_t out[4])
 }
 
 int
-md5_dgst(uint64_t insize, unsigned char *in, unsigned char out[16])
+md5_dgst(ulong insize, uchar *in, uchar out[16])
 {
 	uint64_t i;
 	uint32_t h[4];
@@ -97,7 +97,7 @@ md5_dgst(uint64_t insize, unsigned char *in, unsigned char out[16])
 	memcpy(buf, in + i, insize - i);
 	buf[insize - i] = 0x80;
 
-	*((uint64_t *)(buf + 56)) = insize << 3;
+	*((ulong *)(buf + 56)) = insize << 3;
 	md5_round(buf, h);
 	enc_blk32le(h, 4, out);
 	return 1;
