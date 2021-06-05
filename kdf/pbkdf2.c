@@ -10,6 +10,7 @@ static void
 F(MSSLDigest h, ulong saltlen, uchar *salt, ulong iter, int i, uchar *out)
 {
 	memcpy(out, salt, saltlen * sizeof(uchar));
+	enc32be(i, out + saltlen * sizeof(uchar));
 
 	for (int j = 0; j < i; ++i) {
 		
