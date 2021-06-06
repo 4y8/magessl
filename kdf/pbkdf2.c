@@ -3,26 +3,35 @@
 #include <endian.h>
 #include <kdf.h>
 
-static void F(MSSLDigest h, ulong saltlen, uchar *salt,
-              ulong iter, int i, uchar *out);
+static void F(MSSLDigest h, ulong keysize, uchar *key, ulong saltsize,
+              uchar *salt, ulong iter, uchar *out);
 
 static void
-F(MSSLDigest h, ulong saltlen, uchar *salt, ulong iter, int i, uchar *out)
+F(MSSLDigest h, ulong keysize, uchar *key, ulong saltsize,
+  uchar *salt, ulong iter, uchar *out)
 {
-	memcpy(out, salt, saltlen * sizeof(uchar));
-	enc32be(i, out + saltlen * sizeof(uchar));
+	uchar buf[saltsize + 4], outbuf[h.outsize];
 
-	for (int j = 0; j < i; ++i) {
-		
+	memcpy(buf, salt, saltsize);
+	enc32be(iter, buf + saltsize);
+
+	memset(out, 0, h.outsize);
+
+	for (; iter > 0; --iter) {
+		hmac_dgst(h, keysize, key, h.outsize, buf, outbuf);
+		memcpy(buf, outbuf, h.outsize);
+
+		for (int i = 0; i < h.outsize; ++i)
+			out[i] ^= outbuf[i];
 	}
 }
 
 void
-pbkdf2_kdf(MSSLDigest h, ulong passlen, uchar *pass, ulong saltlen, uchar *salt,
-           ulong iter, ulong len, uchar *out)
+pbkdf2_kdf(MSSLDigest h, ulong passsize, uchar *pass, ulong saltsize,
+           uchar *salt, ulong iter, ulong len, uchar *out)
 {
 	int l, r;
 
-	l = len / h.len;
-	r = len - (l - 1) * h.len;
+	l = len / h.outsize;
+	r = len - (l - 1) * h.outsize;
 }

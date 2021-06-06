@@ -18,7 +18,7 @@ int sha256_dgst(ulong insize, uchar *in, uchar out[32]);
 int ripemd_dgst(ulong insize, uchar *in, uchar out[20]);
 
 int hmac_dgst(MSSLDigest h, ulong keysize, uchar *key,
-              ulong insize, uchar in, uchar *out);
+              ulong insize, uchar *in, uchar *out);
 
 enum mssl_digests {
 	MSSL_MD4,
