@@ -27,11 +27,14 @@ F(MSSLDigest h, ulong keysize, uchar *key, ulong saltsize,
 }
 
 void
-pbkdf2_kdf(MSSLDigest h, ulong passsize, uchar *pass, ulong saltsize,
+pbkdf2_kdf(MSSLDigest h, ulong keysize, uchar *key, ulong saltsize,
            uchar *salt, ulong iter, ulong len, uchar *out)
 {
 	int l, r;
 
 	l = len / h.outsize;
 	r = len - (l - 1) * h.outsize;
+
+	for (int i = 0; i < l; ++i)
+		F(h, keysize, key, saltsize, salt, i, out + i * h.outsize);
 }
