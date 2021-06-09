@@ -16,6 +16,8 @@ int sha1_dgst(ulong insize, uchar *in, uchar out[20]);
 int sha224_dgst(ulong insize, uchar *in, uchar out[32]);
 int sha256_dgst(ulong insize, uchar *in, uchar out[32]);
 int ripemd_dgst(ulong insize, uchar *in, uchar out[20]);
+int blake2b_512_dgst(ulong insize, uchar *in, ulong keysize,
+                     uchar *key, uchar out[64]);
 
 int hmac_dgst(MSSLDigest h, ulong keysize, uchar *key,
               ulong insize, uchar *in, uchar *out);
@@ -26,6 +28,7 @@ enum mssl_digests {
 	MSSL_SHA1,
 	MSSL_SHA224,
 	MSSL_SHA256,
+	MSSL_BLAKE2B_512,
 	MSSL_RIPEMD
 };
 

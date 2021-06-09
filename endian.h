@@ -7,9 +7,12 @@
  * it's useless according to the C standard... */
 #define ROTL32(x, n)	(((x) << (n)) | ((x) >> (32 - (n))))
 #define ROTR32(x, n)	(((x) << (32 - (n))) | ((x) >> (n)))
+#define ROTL64(x, n)	(((x) << (n)) | ((x) >> (64 - (n))))
+#define ROTR64(x, n)	(((x) << (64 - (n))) | ((x) >> (n)))
 
 typedef unsigned char uchar;
-typedef unsigned long ulong;
+typedef uint64_t ulong;
+typedef uint32_t uint;
 
 void dec32le(uchar in[4], uint32_t *out);
 void enc32le(uint32_t in, uchar out[4]);
