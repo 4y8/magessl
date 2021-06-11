@@ -16,8 +16,8 @@ int sha1_dgst(ulong insize, uchar *in, uchar out[20]);
 int sha224_dgst(ulong insize, uchar *in, uchar out[32]);
 int sha256_dgst(ulong insize, uchar *in, uchar out[32]);
 int ripemd_dgst(ulong insize, uchar *in, uchar out[20]);
-int blake2b_512_dgst(ulong insize, uchar *in, ulong keysize,
-                     uchar *key, uchar out[64]);
+int blake2b_dgst(ulong insize, uchar *in, ulong keysize,
+                 uchar *key, ulong outsize, uchar *out);
 
 int hmac_dgst(MSSLDigest h, ulong keysize, uchar *key,
               ulong insize, uchar *in, uchar *out);

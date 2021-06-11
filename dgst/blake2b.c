@@ -83,10 +83,21 @@ compress(ulong h[8], ulong m[16], ulong t[2], int islast)
 }
 
 int
-blake2b_512_dgst(ulong insize, uchar *in, ulong keysize,
-                 uchar *key, uchar out[64])
+blake2b_dgst(ulong insize, uchar *in, ulong keysize,
+             uchar *key, ulong outsize, uchar *out)
 {
-	ulong h[8];
+	ulong h[8], t[2];
+	ulong d[((keysize > 0) << 4) + (((insize & 0x1111) == 0) << 4) +
+	        (insize >> 4)];
 
+	memcpy(h, IV, 8 * sizeof(ulong));
+	h[0] ^= 0x01010000 ^ (keysize << 8) ^ outsize;
+
+	t[0] = 0;
+	t[1] = 0;
+
+	if (keysize > 0) {
+		memcpy(d, key, keysize);
+	}
 	return 0;
 }
